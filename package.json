@@ -1,15 +1,15 @@
 {
   "name": "gymappnew",
   "version": "1.0.0",
+    "engines": {
+    "node": "v6.2.2"
+  },
   "description": "a service for the gymapp",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-    "version": "1.0.0",
-  "engines": {
-    "node": "v6.2.2"
-  },
+  
   "author": "",
   "license": "ISC",
   "dependencies": {
