@@ -15,6 +15,12 @@ mongoose.connect(databaseCon);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.get('/', function(req, res){
+   
+   res.send('home');
+        
+});
+
 var authu = function(req, res, next) {
         
         var credentials = auth(req);
