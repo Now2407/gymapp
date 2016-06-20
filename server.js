@@ -308,5 +308,5 @@ app.get('/gym/search', function(req, res){
 
 
 
-http.listen(process.argv[2]);
+app.listen(process.argv[2]);
 
