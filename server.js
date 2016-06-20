@@ -10,7 +10,7 @@ var twilio = require('twilio');
 var client = require('./node_modules/twilio/lib')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 /* ADD DEALS ROUTES & MESSAGES FOR TRAINER, USER, AND GYM ACCOUNT PAGES LATER*/
 
-mongoose.connect(PROD_MONG);
+mongoose.connect(process.env.PROD_MONG);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -85,18 +85,18 @@ app.post('/self', function(req, res){
         
         
         
-     client.makeCall({
-        
-        to: req.body.number,
-        from: '+16504683750',
-        url: 'https://6e04649a.ngrok.io/xml'
-        
-        }, function(err, data){
-                
-                console.log(err);
-                console.log(data);
-        });
-        
+     //client.makeCall({
+     //   
+     //   to: req.body.number,
+     //   from: '+16504683750',
+     //   url: 'https://6e04649a.ngrok.io/xml'
+     //   
+     //   }, function(err, data){
+     //           
+     //           console.log(err);
+     //           console.log(data);
+     //   });
+     //   
        
         
                 
