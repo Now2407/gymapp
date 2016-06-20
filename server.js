@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var path = require('path');
 var auth = require('basic-auth');
+var http = require('http');
 
 var twilio = require('twilio');
 var client = require('./node_modules/twilio/lib')(SID, AuthToken);
@@ -300,7 +301,8 @@ app.get('/gym/search', function(req, res){
 
 
 
-var port = process.env.PORT || 8080;
 
-app.listen(port);
+http.listen(process.env.PORT || 3000, function(){
+  console.log('listening on', http.address().port);
+});
 
