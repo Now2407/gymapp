@@ -1,0 +1,220 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <title><!-- Insert your title here --></title>
+</head>
+<body>
+
+
+<form action="" id="fm" method="POST">
+<p>Details</p>
+<select id="selectedVal">
+    <option value="select">Select</option>
+    <option value="gym">Gym</option>
+    <option value="studio">Studio</option>
+    <option value="club">Club</option>
+    
+</select>
+<div id="first">
+<div id="n"><input type="text" class="name" placeholder="name..."><br></div>
+<div id="a"><input type="text" class="address" placeholder="address..."><br></div>
+<div id="c"><input type="text" class="city" placeholder="city..."><br></div>
+<div id="z"><input type="text" class="zipcode" placeholder="zipcode..."><br></div>
+<div id="s"><input type="text" class="state" placeholder="state..."><br></div>
+<div id="cl"><input type="text" class="contract_length" placeholder="length of contract..."><br></div>
+<div id="nu"><input type="text" class="phone_number" placeholder="phone number of place..."><br></div>
+</div>
+<p>Admenities</p>
+<input type="checkbox" id="amen" value="Cardio Equipment">Cardio Equipment<br>
+<input type="checkbox" id="amen" value="Circuit Training">Circuit Training<br>
+<input type="checkbox"  id="amen"value="Weights">Weights<br>
+<input type="checkbox"  id="amen"value="Treadmil">Treadmil<br>
+<input type="checkbox" id="amen" value="Zumba Fitness">Zumba Fitness<br>
+<input type="checkbox"  id="amen"value="Perosnal Training">Perosnal Training<br>
+<input type="checkbox"  id="amen"value="Group Cycling">Group Cycling<br>
+<input type="checkbox"id="amen" value="Group Exersize">Group Exersize<br>
+<input type="checkbox" id="amen" value="Youth Care">Youth Care<br>
+<input type="checkbox" id="amen"value="Towls">Towls<br>
+
+
+<p>Facilities</p>
+<input type="checkbox" id="fac" value="Bathroom">Bathroom<br>
+<input type="checkbox" id="fac" value="Showers">Showers<br>
+<input type="checkbox" id="fac" value="lockers">lockers<br>
+<input type="checkbox" id="fac" value="Indoor Pool">Indoor Pool<br>
+<input type="checkbox" id="fac" value="Outdoor Pool">Outdoor Pool<br>
+<input type="checkbox" id="fac" value="lockers">lockers<br>
+<input type="checkbox" id="fac" value="Air Condtioning">Air Condtioning<br>
+<input type="checkbox"  id="fac"value="Heating">Heating<br>
+
+
+<p>Membership Costs</p>
+
+
+<div id="content">
+    <a href="#" id="add">add</a>
+<div id="1"><input class="atype" type="text" placeholder="type"><input class="desc" type="text"  placeholder="description"><input type="text" class="rate" placeholder="rate"><input type="radio" class="1" name="1" value="monthly" checked="checked">Monthly<input type="radio" class="1" name="1" value="yearly">Yearly<br></div></div>
+</div>
+<div class="arr"></div>
+
+
+<input type="submit" id="go" value="add gym">
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<script>
+    
+$(document).ready(function(){
+        
+    var newnum = 1;
+
+
+    $('#add').click(function(e){
+        e.preventDefault();
+        
+        newnum++;
+        
+        $("#content").append('<div id="'+ newnum +'"><input class="atype" type="text" placeholder="type"><input class="desc" type="text" placeholder="description"><input type="text" class="rate" placeholder="rate"><input type="radio" class="'+ newnum +'" name="'+ newnum +'" value="monthly" checked="checked">Monthly<input type="radio" class="'+ newnum +' " name="'+ newnum +'" value="yearly">Yearly<a href="#" id="remove">X<br></div>');
+});
+
+
+
+
+$('#go').click(function(e){
+    
+    e.preventDefault();
+    
+    var list = {
+        memberships: [],
+        Facilities: [],
+        Admenities: [],
+        details: [],
+       
+        };
+    
+    
+    if (!$(".name").val() && !$(".address").val() && !$(".city").val() && !$(".zipcode").val() && !$(".state").val() && !$(".contract_length").val() && !$(".phone_number").val()) {
+    alert('no value');
+    return;
+    }
+    if (!$("#fac:checked").length > 0) {
+        
+    alert('no checked');
+    return;
+        
+    }
+                    
+      $("#content > div").each(function(){
+    
+        var ids = $(this).attr('id');
+
+            $("#"+ids).each(function(){
+               var t = $("#"+ids+ " > .atype").val();
+               if (t.length == 0) {
+                    alert('no value in type'); 
+                    return
+               }
+               var d = $("#"+ids+ " > .desc").val();
+               if (d.length == 0) {
+                    alert('no value in desccription'); 
+                    return
+               }
+               var r = $("#"+ids+ " > .rate").val();
+               if (r.length == 0) {
+                    alert('no value in rate'); 
+                    return
+               }
+               
+                list.memberships.push({type: $("#"+ids+ " > .atype").val(), desc: $("#"+ids+ " > .desc").val(),
+              rate: $("#"+ids+ " > .rate").val(), checked: $('input[name="'+ ids +'"]:checked').val()});
+
+               
+            });
+       });
+
+
+        
+       var aval = $("#selectedVal").val();
+       
+       if (aval === "select") {
+        alert('please choose a typ');
+        return;
+        
+       }
+       
+       if (aval === "gym") {
+        
+        list.details.push({typeofplace: "gym"});
+        
+       }
+       if (aval === "studio") {
+                list.details.push({typeofplace: "gym"});
+
+       }
+       if (aval === "club") {
+                list.details.push({typeofplace: "gym"});
+
+       }
+       
+        
+            
+    
+    
+    $("#fac:checked").each(function(){
+        
+        
+                list.Facilities.push({item: $(this).val()});
+    });
+
+    $("#amen:checked").each(function(){
+    
+
+                list.Admenities.push({aitem: $(this).val()});
+    });
+
+    $("#first > div").each(function(){
+    
+        var id1 = $(this).attr('id');
+    
+            $("#"+id1).each(function(){
+        
+                  list.details.push({name: $("#"+id1+ " > .name").val(), address: $("#"+id1+ " > .address").val(), city: $("#"+id1+ " > .city").val(), zipcode: $("#"+id1+ " > .zipcode").val(),
+                    state: $("#"+id1+ " > .state").val(), contract_length: $("#"+id1+ " > .contract_length").val(), phone_number: $("#"+id1+ " > .phone_number").val()});
+            });
+});
+
+$.ajax({
+            type:"POST",
+            url: "http://localhost:8080/place/new",
+            contentType: "application/json",
+            data: JSON.stringify(list),
+                success:function(data){
+            }  
+        
+    });
+               
+
+});
+ $('#content').on("click", "#remove", function(e){
+
+   e.preventDefault();
+   $(this).parent('div').remove();
+
+});
+
+
+});
+
+
+
+
+
+
+    
+    
+</script>
+
+</body>
+</html>
