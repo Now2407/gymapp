@@ -7,10 +7,10 @@ var auth = require('basic-auth');
 var http = require('http');
 
 var twilio = require('twilio');
-var client = require('./node_modules/twilio/lib')(SID, AuthToken);
+var client = require('./node_modules/twilio/lib')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 /* ADD DEALS ROUTES & MESSAGES FOR TRAINER, USER, AND GYM ACCOUNT PAGES LATER*/
 
-mongoose.connect(databaseCon);
+mongoose.connect(process.env.databaseCon);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -25,7 +25,7 @@ var authu = function(req, res, next) {
         
         var credentials = auth(req);
 
-        if (!credentials || credentials.name !== Username || credentials.pass !== Password) {
+        if (!credentials || credentials.name !== process.env.Username || credentials.pass !== process.env.Password) {
     res.statusCode = 401
     res.setHeader('WWW-Authenticate', 'Basic realm="example"')
     res.end('Access denied')
