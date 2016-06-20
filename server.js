@@ -10,7 +10,7 @@ var twilio = require('twilio');
 var client = require('./node_modules/twilio/lib')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 /* ADD DEALS ROUTES & MESSAGES FOR TRAINER, USER, AND GYM ACCOUNT PAGES LATER*/
 
-mongoose.connect(process.env.PROD_MONG);
+mongoose.connect(process.env.MONGOLAB_URI);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -308,5 +308,5 @@ app.get('/gym/search', function(req, res){
 
 
 
-app.listen(process.argv[2]);
+app.listen('8080');
 
