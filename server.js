@@ -7,7 +7,7 @@ var auth = require('basic-auth');
 var http = require('http');
 
 var twilio = require('twilio');
-var client = require('./node_modules/twilio/lib')(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+var client = require('./node_modules/twilio/lib')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 /* ADD DEALS ROUTES & MESSAGES FOR TRAINER, USER, AND GYM ACCOUNT PAGES LATER*/
 
 mongoose.connect(process.env.databaseCon);
