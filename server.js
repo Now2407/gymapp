@@ -4,48 +4,33 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var path = require('path');
 var auth = require('basic-auth');
-var http = require('http');
-
 var twilio = require('twilio');
-var client = require('./node_modules/twilio/lib')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+//var client = require('./node_modules/twilio/lib')('API_KEY', 'AUTH_TOKEN');
 /* ADD DEALS ROUTES & MESSAGES FOR TRAINER, USER, AND GYM ACCOUNT PAGES LATER*/
 
-mongoose.connect(process.env.MONGOLAB_URI);
+mongoose.connect('mongodb://localhost/gym');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get('/', function(req, res){
-   
-   res.send('home');
-        
-});
+//var authu = function(req, res, next) {
+//        
+//        var credentials = auth(req);
+//
+//        if (!credentials || credentials.name !== 'NAME' || credentials.pass !== 'PASS') {
+//    res.statusCode = 401
+//    res.setHeader('WWW-Authenticate', 'Basic realm="example"')
+//    res.end('Access denied')
+//  } else {
+//    next();
+//  }
+//}
 
-var authu = function(req, res, next) {
-        
-        var credentials = auth(req);
-
-        if (!credentials || credentials.name !== process.env.Username || credentials.pass !== process.env.Password) {
-    res.statusCode = 401
-    res.setHeader('WWW-Authenticate', 'Basic realm="example"')
-    res.end('Access denied')
-  } else {
-    next();
-  }
-}
-
-app.use(authu);
+//app.use(authu);
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('/xml', function(req, res){
-        
-        
-
-  
-  res.render('../fire', {req: req, res: res});
-  
-});
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -81,60 +66,8 @@ app.get('/place/new', function(req, res){
     res.render('../views/addplace.ejs');
 });
 
-app.post('/self', function(req, res){
-        
-        
-        
-     //client.makeCall({
-     //   
-     //   to: req.body.number,
-     //   from: '+16504683750',
-     //   url: 'https://6e04649a.ngrok.io/xml'
-     //   
-     //   }, function(err, data){
-     //           
-     //           console.log(err);
-     //           console.log(data);
-     //   });
-     //   
-       
-        
-                
-        
-});
-
-app.post('/cofirm', function(req, res){
-        
-     
-});
-
-app.get('/self', function(req, res){
-        
-        res.render('../views/test.ejs');
-        
-        
-});
-
-app.get('/self/verify', function(req, res){
-        
-        res.render('../views/res.ejs');
-        
-        
-        
-});
-app.post('/verifed', function(req, res){
-        
-
-// Your application credentials
-
-});
-app.get('/verify', function(req, res){
-
-
-
-
-        
-        
+app.get('/place/new/thankyou', function(req, res){
+        res.send('thank you!');
 });
 
 app.post('/place/new', function(req, res){
@@ -218,8 +151,14 @@ var place = new Place({
 place.save(function(err, data){
         console.log(data);
         console.log(err);
+        
+        if (!err) {
+         res.send('inserted');
+
+        }
 
 });
+
         
          //if (
         //    membershipline.type === undefined
@@ -237,76 +176,175 @@ place.save(function(err, data){
 
 });
 
-
-app.post('/place/claim', function(req, res){
-    
-});
-app.post('/place/claim', function(req, res){
-    
-});
-app.get('/find', function(req, res){
-        
-
-        
-        
-        Place.find({cityandstae: req.query.city}, function(err, dat){
-                
-                // get all memberships console.log(dat[0]["membership"]);
-                console.log(dat[0]["membership"][0]["atype"]);
-        });
-        
-});
-
 app.get('/', function(req, res){
-    
-    //res.render('./views/search.ejs', {action: "/gyms", activeclass: "1", name: "city"});
-    
+        
+
+res.render('../views/home.ejs', {action: "/gyms/search", method:"GET", value:"search"});
+
+        
 });
 app.get('/gyms', function(req, res){
-    
-   // res.render('./views/search.ejs', {action: "/gyms", activeclass: "1", name: "city"});
-    
+                
+         
+res.render('../views/home.ejs', {action: "/gyms/search", method:"GET", value:"search"});
+
+        
 });
 app.get('/studios', function(req, res){
-    
-   // res.render('./views/search.ejs', {action: "/studios", activeclass: "1", name: "city"});
-    
+                
+         
+res.render('../views/home.ejs', {action: "/studios/search", method:"GET", value:"search"});
+
+
+        
 });
 app.get('/clubs', function(req, res){
-    
-  //  res.render('./views/search.ejs', {action: "/clubs", activeclass: "1", name: "city"});
-    
+                
+         //shows home page
+         
+res.render('../views/home.ejs', {action: "/clubs/search", method:"GET", value:"search"});
+
+
+        
 });
 
-app.get('/club/search', function(req, res){
+app.get('/gyms/search', function(req, res){
+                    var city = req.query.city;
     
-     var place = req.query.place;
-    
-    res.render('./views/club.ejs', {place: place});
-    
-});
-app.get('/studio/search', function(req, res){
-    
-    var place = req.query.place;
-    
-    res.render('./views/studio.ejs', {place: place});
-    
-});
-app.get('/gym/search', function(req, res){
-    
-     var place = req.query.place;
+          
+        
+       Place.find({acity: city, atypeofplace: "gym"}, function(err, somedata){
+                
+        if (somedata) {
+                
+              //  console.log(JSON.stringify(somedata));
+               res.render('../views/results.ejs', {msg: "results found", data: somedata}); 
+        }
+        
+       });
+        
      
-     
-    
-    res.render('./views/gym.ejs', {place: place});
-    
+});
+app.get('/clubs/search', function(req, res){
+        
+      
+        
+                
+                res.render('../views/results.ejs', {term: req.body.term, city: req.query.city});
+
+
+        
+});
+app.get('/studios/search', function(req, res){
+                
+                res.render('../views/results.ejs', {term: req.body.term, city: req.query.city});
+
+
+        
 });
 
 
 
+app.get('/login', function(req, res){
+        
+        //handles trainer, place, and user login
+        
+        
+        
+});
 
 
+app.get('/signup', function(req, res){
+        
+        //handles trainer and user signup
+        
+});
+
+app.get('/place/dashboard', function(req, res){
+                
+         //shows dashboard for the place
+
+        
+});
+app.get('/trainers/account', function(req, res){
+                
+         //shows trainer tabs page
+
+        
+});
+
+app.get('/user', function(req, res){
+        
+        //shows user tabs page
+        
+});
+app.get('/trainers', function(req, res){
+                
+         //shows trainers near your area
+
+        
+});
+app.get('/trainer/:id', function(req, res){
+                
+         //shows trainer prpfile page 
+
+        
+});
+
+                
+
+app.get('/advice/topics', function(req, res){
+                
+         //shows topic links
+
+        
+});
+app.get('/advice/topics/:id', function(req, res){
+                
+         //shows a certian topic feed
+
+        
+});
+
+app.get('/advice/ask', function(req, res){
+                
+         //ask a quesiton page
+
+        
+});
+app.get('/deals', function(req, res){
+                
+         //shows deals near your location based on term
+
+        
+});
+app.get('/deals/:id', function(req, res){
+                
+         //displays deal detail
+
+        
+});
+app.get('/deal/buy', function(req, res){
+                
+         //check out flow for a deal
+
+        
+});
+app.get('/compare', function(req, res){
+                
+         //landing page explaining compare
+
+        
+});
+app.get('/compare/search', function(req, res){
+                
+         //lets you compare 2 places
+
+        
+});
 
 
-app.listen('8080');
+var port = process.env.PORT || 8080;
+
+app.listen(port);
 

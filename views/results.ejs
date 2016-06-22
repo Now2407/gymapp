@@ -1,0 +1,17 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <title><!-- Insert your title here --></title>
+</head>
+<body>
+    
+<%= msg%>
+<% for(var i=0; i < data.length; i++){%>
+<%= data[i].aname; %>
+<%= data[i].atype; %>
+<%= data[i].membership[0].arate; %>
+
+<%}%>
+</body>
+</html>
