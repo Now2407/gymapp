@@ -1,0 +1,35 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <title><!-- Insert your title here --></title>
+</head>
+<body>
+
+<%= aplace.name %>
+<br>
+<%= aplace.typeofplace %>
+<br>
+<%= aplace.fulladdress %>
+<br>
+<%= aplace.phone_number%>
+<p>Admenities</p>
+<ul>
+<% for(var i=0; i < aplace.Admenities.length; i++) { %>
+
+<li><%= aplace.Admenities[i]; %></li>
+
+<% } %>
+</ul>
+<p>Facilities</p>
+<ul>
+<% for(var i=0; i < aplace.Facilities.length; i++) { %>
+
+<li><%= aplace.Facilities[i]; %></li>
+
+<% } %>
+</ul>
+
+
+</body>
+</html>

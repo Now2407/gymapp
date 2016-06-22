@@ -39,13 +39,13 @@ app.set('view engine', 'ejs');
 var Place = mongoose.model("Place", mongoose.Schema({
         
     claimed: 0, //defualts to 0 for unclaimed and 1 for claimed
-    atypeofplace: String,
-    aname: String,
-    aaddress: String,
-    acity: String,
-    azipcode: String,
-    astate: String,
-    acontract_length: String,
+    typeofplace: String,
+    name: String,
+    address: String,
+    city: String,
+    zipcode: String,
+    state: String,
+    contract_length: String,
     phone_number: String,
     fulladdress: String,
     cityandstae: String,
@@ -129,17 +129,17 @@ var block3 = [];
      
 var place = new Place({
         
-         membership: block,
+        membership: block,
         Facilities: block2,
         Admenities: block3,
-       atypeofplace: req.body["details"][0]["typeofplace"],
-         aname: req.body["details"][1]["name"],
-        aaddress: theaddress,
-        acity: thecity,
+        typeofplace: req.body["details"][0]["typeofplace"],
+        name: req.body["details"][1]["name"],
+        address: theaddress,
+        city: thecity,
         cityandstae: thecity + ", " + state,
-        azipcode: req.body["details"][4]["zipcode"],
-        astate: state,
-        acontract_length: req.body["details"][6]["contract_length"],
+        zipcode: req.body["details"][4]["zipcode"],
+        state: state,
+        contract_length: req.body["details"][6]["contract_length"],
         phone_number: req.body["details"][7]["phone_number"],
         fulladdress: theaddress + " " + thecity +", " + state + " "+ req.body["details"][4]["zipcode"],
        
@@ -213,7 +213,7 @@ app.get('/gyms/search', function(req, res){
     
           
         
-       Place.find({acity: city, atypeofplace: "gym"}, function(err, somedata){
+       Place.find({cityandstae: city, typeofplace: "gym"}, function(err, somedata){
                 
         if (somedata) {
                 
@@ -225,19 +225,36 @@ app.get('/gyms/search', function(req, res){
         
      
 });
+
+app.get('/place', function(req, res){
+        
+        var id = req.query.id;
+        
+        Place.findOne({_id: id}, function(err, place){
+                
+                if (place) {
+                        res.render('../views/place.ejs', {aplace: place}); 
+                }
+                
+                console.log(place);
+        });
+        
+        
+});
+
 app.get('/clubs/search', function(req, res){
         
       
         
                 
-                res.render('../views/results.ejs', {term: req.body.term, city: req.query.city});
+                res.render('../views/results.ejs', {city: req.query.city});
 
 
         
 });
 app.get('/studios/search', function(req, res){
                 
-                res.render('../views/results.ejs', {term: req.body.term, city: req.query.city});
+                res.render('../views/results.ejs', {city: req.query.city});
 
 
         
