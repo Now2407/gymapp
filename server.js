@@ -113,8 +113,7 @@ app.post('/place/new', function(req, res){
             }
             
 
-        var s = req.body["details"][5]["state"];
-        var state = s.toUpperCase();
+        var state = req.body["details"][5]["state"];
         var thecity = req.body["details"][3]["city"];
         var theaddress = req.body["details"][2]["address"];
         var thezipcode = req.body["details"][4]["zipcode"];
@@ -134,7 +133,7 @@ var place = new Place({
         city: thecity,
         cityandstae: thecity.toUpperCase() + ", " + state.toUpperCase(),
         zipcode: thezipcode,
-        state: state,
+        state: state.toUpperCase(),
         contract_length: thecontract,
         phone_number: thephonenumber,
         fulladdress: theaddress + " " + thecity +", " + state + " "+ thezipcode,
@@ -211,57 +210,6 @@ app.post('/mapmove', function(req, res){
        
 });
 
-app.get('/search', function(req, res){
-
-      
- var loc = req.query.location;
-    rp('https://maps.googleapis.com/maps/api/geocode/json?address='+loc).then(function(somedata){
-        
-        
-               var dat = JSON.parse(somedata);
-               
-               
-              var northlat = dat.results[0]["geometry"]["bounds"]["northeast"]["lat"];
-              var northlng = dat.results[0]["geometry"]["bounds"]["northeast"]["lng"];
-              var southlat = dat.results[0]["geometry"]["bounds"]["southwest"]["lat"];
-              var southlng = dat.results[0]["geometry"]["bounds"]["southwest"]["lng"];
-
-              
-              var things = [northlng, northlat];
-              var things2 = [southlng, southlat];
-              
-             
-              console.log(things);
-              console.log(things2);
-              
-                
-                Place.find({
-"location": {
-     "$geoWithin": {
-        "$box": [
-          [northlng, northlat],
-          [southlng, southlat]
-        ]
-     }
-  }
-},function(err, data){
-                 
-        console.log(err);
-        console.log(data);
-        
-        
-         res.render('../views/results.ejs', {data: data, northlng: northlng, northlat: northlat, southlng: southlng, southlat: southlat});
-         
-         
-        
-    }).catch(function(error){
-    });
-   
-   
-   });
-});
-
-  
 
 app.get('/', function(req, res){
         
@@ -299,19 +247,12 @@ app.get('/gyms/search', function(req, res){
               var southlng = dat.results[0]["geometry"]["bounds"]["southwest"]["lng"];
 
               
-              var things = [northlng, northlat];
-              var things2 = [southlng, southlat];
-              
-             
-              console.log(things);
-              console.log(things2);
+         
               
                 
                 Place.find({"location": {"$geoWithin": {"$box": [[northlng, northlat],[southlng, southlat]]} }, typeofplace: "gym"},function(err, data){
                  
-        console.log(err);
-        console.log(data);
-        
+      
         
          res.render('../views/results.ejs', {data: data, northlng: northlng, northlat: northlat, southlng: southlng, southlat: southlat});
          
@@ -358,18 +299,14 @@ app.get('/clubs/search', function(req, res){
               var southlng = dat.results[0]["geometry"]["bounds"]["southwest"]["lng"];
 
               
-              var things = [northlng, northlat];
-              var things2 = [southlng, southlat];
-              
              
-              console.log(things);
-              console.log(things2);
+             
+              
               
                 
                 Place.find({"location": {"$geoWithin": {"$box": [[northlng, northlat],[southlng, southlat]]} }, typeofplace: "club"},function(err, data){
                  
-        console.log(err);
-        console.log(data);
+      
         
         
          res.render('../views/results.ejs', {data: data, northlng: northlng, northlat: northlat, southlng: southlng, southlat: southlat});
@@ -400,19 +337,13 @@ app.get('/studios/search', function(req, res){
               var southlng = dat.results[0]["geometry"]["bounds"]["southwest"]["lng"];
 
               
-              var things = [northlng, northlat];
-              var things2 = [southlng, southlat];
-              
-             
-              console.log(things);
-              console.log(things2);
+            
+            
               
                 
                 Place.find({"location": {"$geoWithin": {"$box": [[northlng, northlat],[southlng, southlat]]} }, typeofplace: "studio"},function(err, data){
                  
-        console.log(err);
-        console.log(data);
-        
+    
         
          res.render('../views/results.ejs', {data: data, northlng: northlng, northlat: northlat, southlng: southlng, southlat: southlat});
          
