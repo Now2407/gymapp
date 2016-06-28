@@ -3,12 +3,69 @@
 <html lang="en">
 <head>
     <title><!-- Insert your title here --></title>
+     
+   <script type="text/javascript" src="API_KEY"></script>
+    <script type="text/javascript">
+//            function initialize() {
+//                
+//             
+//                
+//            var southWest = new google.maps.LatLng(<%= southlat %>,<%= southlng %>);
+//            var northEast = new google.maps.LatLng(<%= northlat %>,<%= northlng %>);
+//            
+//            var bounds = new google.maps.LatLngBounds(southWest,northEast);
+//            
+//            
+//            
+//        var mapOptions = {
+//      mapTypeId: google.maps.MapTypeId.ROADMAP,
+//      
+//    };
+//    
+//    
+//    var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+//    
+//
+//  
+//  map.fitBounds(bounds);
+//      
+//  
+////zoomChangeBoundsListener = 
+////    google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
+////        if (this.getZoom()){
+////            this.setZoom(13);
+////        }
+////});
+////    setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000);
+////  
+//  
+//  }
+//    
+//  
+// 
+//  google.maps.event.addDomListener(window, 'load', initialize);
+        </script>
+     
+    </style>
 </head>
 <body>
+
+<!--<div id="map-canvas" style="width: 300px; height: 500px"></div> -->
+
     
 <% for(var i=0; i < data.length; i++){%>
 <a href="/place?id=<%= data[i]._id %>"><%= data[i].name %></a>
-
 <%}%>
+
+
+ 
+
+
+
+
+
+
+ 
+
 </body>
 </html>

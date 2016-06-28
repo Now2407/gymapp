@@ -5,29 +5,28 @@ var mongoose = require('mongoose');
 var path = require('path');
 var auth = require('basic-auth');
 var twilio = require('twilio');
+var AWS = require('aws-sdk');
+var multer = require('multer');
+var fs = require('fs');
+var request = require('request');
+var rp = require('request-promise');
+var cons = require('consolidate');
+var ejs = require('ejs');
 
-//var client = require('./node_modules/twilio/lib')('API_KEY', 'AUTH_TOKEN');
-/* ADD DEALS ROUTES & MESSAGES FOR TRAINER, USER, AND GYM ACCOUNT PAGES LATER*/
+// view engine setup
+app.engine('html', cons.ejs);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'html');
 
-mongoose.connect('mongodb://localhost/gym');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//var authu = function(req, res, next) {
-//        
-//        var credentials = auth(req);
-//
-//        if (!credentials || credentials.name !== 'NAME' || credentials.pass !== 'PASS') {
-//    res.statusCode = 401
-//    res.setHeader('WWW-Authenticate', 'Basic realm="example"')
-//    res.end('Access denied')
-//  } else {
-//    next();
-//  }
-//}
 
-//app.use(authu);
+mongoose.connect('mongodb://localhost/gym');
+
+mongoose.set('debug', true)
+
 
 app.use(express.static(__dirname + '/public'));
 
@@ -56,9 +55,11 @@ var Place = mongoose.model("Place", mongoose.Schema({
         adesc: String
     }],
     Facilities: [String],
-    Admenities: [String]
+    Admenities: [String],
+     location: {type: [Number], index: "2d"},
+     
+    
     }));
-
 
 
 app.get('/place/new', function(req, res){
@@ -70,158 +71,257 @@ app.get('/place/new/thankyou', function(req, res){
         res.send('thank you!');
 });
 
+
+
+
+
+app.post('/search/update', function(req, res){
+        
+        
+        
+});
+
+
+
+
 app.post('/place/new', function(req, res){
-
-    
         
-var block = [];
-var block2 = [];
-var block3 = [];
+        var lat;
+        var lng;      
+        var block = [];
+        var block2 = [];
+        var block3 = [];
+        var cords = [];
 
         
-        if (req.body.memberships === undefined) {
-               console.log('membership is blank');
-               return;
-       }
-       if (req.body.memberships === "") {
-                console.log('membership is blank');
-                return;
-       }
-       
-       
-     
-       
-     for (var i=0; i < req.body.memberships.length; i++) {
-     
- 
-     
-   block.push({"atype": req.body["memberships"][i]["type"], "adesc": req.body["memberships"][i]["desc"], "arate": req.body["memberships"][i]["rate"], "achecked": req.body["memberships"][i]["checked"]});
-     
-     
-     }
- 
- for (var i=0; i < req.body.Facilities.length; i++) {
+        for (var i=0; i < req.body.memberships.length; i++) {
+            
+         block.push({"atype": req.body["memberships"][i]["type"], "adesc": req.body["memberships"][i]["desc"], "arate": req.body["memberships"][i]["rate"], "achecked": req.body["memberships"][i]["checked"]});
+            
+        }
+        
+        for (var i=0; i < req.body.Facilities.length; i++) {
+        
+         block2.push(req.body["Facilities"][i]["item"]);
+            
+         }
+            
+        for (var i=0; i < req.body.Admenities.length; i++) {
+           
+        block3.push(req.body["Admenities"][i]["aitem"]);
+            
+            }
+            
 
-     
+        var s = req.body["details"][5]["state"];
+        var state = s.toUpperCase();
+        var thecity = req.body["details"][3]["city"];
+        var theaddress = req.body["details"][2]["address"];
+        var thezipcode = req.body["details"][4]["zipcode"];
+        var thetypeofplace = req.body["details"][0]["typeofplace"]
+        var thecontract = req.body["details"][6]["contract_length"];
+        var thephonenumber =  req.body["details"][7]["phone_number"];
+        var thename = req.body["details"][1]["name"];
  
-     
-   block2.push(req.body["Facilities"][i]["item"]);
-     
-     
-     }
-     
-     
-      for (var i=0; i < req.body.Admenities.length; i++) {
-    
- 
-     
-   block3.push(req.body["Admenities"][i]["aitem"]);
-     
-     
-     }
-     
-     var s = req.body["details"][5]["state"];
-     var state = s.toUpperCase();
-     
-     var thecity = req.body["details"][3]["city"];
-     var theaddress = req.body["details"][2]["address"];
-     
-     
 var place = new Place({
         
         membership: block,
         Facilities: block2,
         Admenities: block3,
-        typeofplace: req.body["details"][0]["typeofplace"],
-        name: req.body["details"][1]["name"],
+        typeofplace: thetypeofplace ,
+        name: thename,
         address: theaddress,
         city: thecity,
-        cityandstae: thecity + ", " + state,
-        zipcode: req.body["details"][4]["zipcode"],
+        cityandstae: thecity.toUpperCase() + ", " + state.toUpperCase(),
+        zipcode: thezipcode,
         state: state,
-        contract_length: req.body["details"][6]["contract_length"],
-        phone_number: req.body["details"][7]["phone_number"],
-        fulladdress: theaddress + " " + thecity +", " + state + " "+ req.body["details"][4]["zipcode"],
+        contract_length: thecontract,
+        phone_number: thephonenumber,
+        fulladdress: theaddress + " " + thecity +", " + state + " "+ thezipcode,
+        
+});
+
+
+
+if (req.body.memberships === undefined) {
+    console.log('membership is blank');
+    return;
+}
+if (req.body.memberships === "") {
+    console.log('membership is blank');
+    return;
+}
+
+
+        rp('https://maps.googleapis.com/maps/api/geocode/json?address='+req.body["details"][2]["address"]+req.body["details"][3]["city"]+req.body["details"][5]["state"]).then(function(data){
+           
+          
+        var dat = JSON.parse(data);
+           
+        if (dat.status === "ZERO_RESULTS") {
+                                       
+            console.log("not found");
+            
+            return;
+            
+       }
        
+       
+        cords[1] = dat.results[0]["geometry"]["location"]["lat"];
+        cords[0] = dat.results[0]["geometry"]["location"]["lng"];
         
         
         
+        place.location = cords;      
+          
+ 
+        place.save(function(err, data){
+                console.log(data);
+                console.log(err);
+                
+                if (!err) {
+                 res.send('inserted');
+        
+                }
+                
+        });
+        
+    }).catch(function(err){
+        
+        
+        
+        });
+          
+      
+});
+     
+     
+      
+app.post('/mapmove', function(req, res){
+        
+        //var newbounds = req.query.newbouds;
+        
+       // if(newbounds){
+       
+       // get southwest, northwest, eastwest, and southwest vars
+       
+       //do a $box query on new bounds
+       
+       //pull back results and rerender new data
+       
 });
 
-place.save(function(err, data){
-        console.log(data);
+app.get('/search', function(req, res){
+
+      
+ var loc = req.query.location;
+    rp('https://maps.googleapis.com/maps/api/geocode/json?address='+loc).then(function(somedata){
+        
+        
+               var dat = JSON.parse(somedata);
+               
+               
+              var northlat = dat.results[0]["geometry"]["bounds"]["northeast"]["lat"];
+              var northlng = dat.results[0]["geometry"]["bounds"]["northeast"]["lng"];
+              var southlat = dat.results[0]["geometry"]["bounds"]["southwest"]["lat"];
+              var southlng = dat.results[0]["geometry"]["bounds"]["southwest"]["lng"];
+
+              
+              var things = [northlng, northlat];
+              var things2 = [southlng, southlat];
+              
+             
+              console.log(things);
+              console.log(things2);
+              
+                
+                Place.find({
+"location": {
+     "$geoWithin": {
+        "$box": [
+          [northlng, northlat],
+          [southlng, southlat]
+        ]
+     }
+  }
+},function(err, data){
+                 
         console.log(err);
+        console.log(data);
         
-        if (!err) {
-         res.send('inserted');
-
-        }
-
+        
+         res.render('../views/results.ejs', {data: data, northlng: northlng, northlat: northlat, southlng: southlng, southlat: southlat});
+         
+         
+        
+    }).catch(function(error){
+    });
+   
+   
+   });
 });
 
-        
-         //if (
-        //    membershipline.type === undefined
-        //    || membershipline.type.length > 0 ||
-        //    membershipline.desc !== undefined ||
-        //    membershipline.desc.length > 0
-        //    ) {
-        //        
-        //        res.send(200, {error: 'invalid membershipline'});
-        //        console.error('submitted wrong membership');
-        //        return;
-        //}  
   
-  
-
-});
 
 app.get('/', function(req, res){
         
-
 res.render('../views/home.ejs', {action: "/gyms/search", method:"GET", value:"search"});
 
-        
 });
 app.get('/gyms', function(req, res){
-                
          
 res.render('../views/home.ejs', {action: "/gyms/search", method:"GET", value:"search"});
-
         
 });
 app.get('/studios', function(req, res){
                 
-         
 res.render('../views/home.ejs', {action: "/studios/search", method:"GET", value:"search"});
 
-
-        
 });
 app.get('/clubs', function(req, res){
-                
-         //shows home page
          
 res.render('../views/home.ejs', {action: "/clubs/search", method:"GET", value:"search"});
-
-
-        
+     
 });
 
 app.get('/gyms/search', function(req, res){
-                    var city = req.query.city;
-    
-          
+      
+       var loc = req.query.location;
+    rp('https://maps.googleapis.com/maps/api/geocode/json?address='+loc).then(function(somedata){
         
-       Place.find({cityandstae: city, typeofplace: "gym"}, function(err, somedata){
-                
-        if (somedata) {
-                
-              //  console.log(JSON.stringify(somedata));
-               res.render('../views/results.ejs', {msg: "results found", data: somedata}); 
-        }
         
-       });
+               var dat = JSON.parse(somedata);
+               
+               
+              var northlat = dat.results[0]["geometry"]["bounds"]["northeast"]["lat"];
+              var northlng = dat.results[0]["geometry"]["bounds"]["northeast"]["lng"];
+              var southlat = dat.results[0]["geometry"]["bounds"]["southwest"]["lat"];
+              var southlng = dat.results[0]["geometry"]["bounds"]["southwest"]["lng"];
+
+              
+              var things = [northlng, northlat];
+              var things2 = [southlng, southlat];
+              
+             
+              console.log(things);
+              console.log(things2);
+              
+                
+                Place.find({"location": {"$geoWithin": {"$box": [[northlng, northlat],[southlng, southlat]]} }, typeofplace: "gym"},function(err, data){
+                 
+        console.log(err);
+        console.log(data);
+        
+        
+         res.render('../views/results.ejs', {data: data, northlng: northlng, northlat: northlat, southlng: southlng, southlat: southlat});
+         
+         
+        
+    }).catch(function(error){
+    });
+   
+   
+   });
         
      
 });
@@ -235,8 +335,7 @@ app.get('/place', function(req, res){
                 if (place) {
                         res.render('../views/place.ejs', {aplace: place}); 
                 }
-                
-                console.log(place);
+             
         });
         
         
@@ -244,20 +343,86 @@ app.get('/place', function(req, res){
 
 app.get('/clubs/search', function(req, res){
         
-      
+            
+ 
+                      var loc = req.query.location;
+    rp('https://maps.googleapis.com/maps/api/geocode/json?address='+loc).then(function(somedata){
         
+        
+               var dat = JSON.parse(somedata);
+               
+               
+              var northlat = dat.results[0]["geometry"]["bounds"]["northeast"]["lat"];
+              var northlng = dat.results[0]["geometry"]["bounds"]["northeast"]["lng"];
+              var southlat = dat.results[0]["geometry"]["bounds"]["southwest"]["lat"];
+              var southlng = dat.results[0]["geometry"]["bounds"]["southwest"]["lng"];
+
+              
+              var things = [northlng, northlat];
+              var things2 = [southlng, southlat];
+              
+             
+              console.log(things);
+              console.log(things2);
+              
                 
-                res.render('../views/results.ejs', {city: req.query.city});
+                Place.find({"location": {"$geoWithin": {"$box": [[northlng, northlat],[southlng, southlat]]} }, typeofplace: "club"},function(err, data){
+                 
+        console.log(err);
+        console.log(data);
+        
+        
+         res.render('../views/results.ejs', {data: data, northlng: northlng, northlat: northlat, southlng: southlng, southlat: southlat});
+         
+         
+        
+    }).catch(function(error){
+    });
+   
+   
+   }); 
 
 
         
 });
 app.get('/studios/search', function(req, res){
                 
-                res.render('../views/results.ejs', {city: req.query.city});
-
-
+       var loc = req.query.location;
+    rp('https://maps.googleapis.com/maps/api/geocode/json?address='+loc).then(function(somedata){
         
+        
+               var dat = JSON.parse(somedata);
+               
+               
+              var northlat = dat.results[0]["geometry"]["bounds"]["northeast"]["lat"];
+              var northlng = dat.results[0]["geometry"]["bounds"]["northeast"]["lng"];
+              var southlat = dat.results[0]["geometry"]["bounds"]["southwest"]["lat"];
+              var southlng = dat.results[0]["geometry"]["bounds"]["southwest"]["lng"];
+
+              
+              var things = [northlng, northlat];
+              var things2 = [southlng, southlat];
+              
+             
+              console.log(things);
+              console.log(things2);
+              
+                
+                Place.find({"location": {"$geoWithin": {"$box": [[northlng, northlat],[southlng, southlat]]} }, typeofplace: "studio"},function(err, data){
+                 
+        console.log(err);
+        console.log(data);
+        
+        
+         res.render('../views/results.ejs', {data: data, northlng: northlng, northlat: northlat, southlng: southlng, southlat: southlat});
+         
+         
+        
+    }).catch(function(error){
+    });
+   
+   
+   });
 });
 
 
@@ -277,88 +442,9 @@ app.get('/signup', function(req, res){
         
 });
 
-app.get('/place/dashboard', function(req, res){
-                
-         //shows dashboard for the place
 
-        
-});
-app.get('/trainers/account', function(req, res){
-                
-         //shows trainer tabs page
 
-        
-});
 
-app.get('/user', function(req, res){
-        
-        //shows user tabs page
-        
-});
-app.get('/trainers', function(req, res){
-                
-         //shows trainers near your area
-
-        
-});
-app.get('/trainer/:id', function(req, res){
-                
-         //shows trainer prpfile page 
-
-        
-});
-
-                
-
-app.get('/advice/topics', function(req, res){
-                
-         //shows topic links
-
-        
-});
-app.get('/advice/topics/:id', function(req, res){
-                
-         //shows a certian topic feed
-
-        
-});
-
-app.get('/advice/ask', function(req, res){
-                
-         //ask a quesiton page
-
-        
-});
-app.get('/deals', function(req, res){
-                
-         //shows deals near your location based on term
-
-        
-});
-app.get('/deals/:id', function(req, res){
-                
-         //displays deal detail
-
-        
-});
-app.get('/deal/buy', function(req, res){
-                
-         //check out flow for a deal
-
-        
-});
-app.get('/compare', function(req, res){
-                
-         //landing page explaining compare
-
-        
-});
-app.get('/compare/search', function(req, res){
-                
-         //lets you compare 2 places
-
-        
-});
 
 
 var port = process.env.PORT || 8080;
